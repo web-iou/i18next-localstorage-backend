@@ -1,6 +1,6 @@
 {
-  "name": "i18next-localstorage-backend",
-  "version": "4.2.0",
+  "name": "i18next-mmkv-backend",
+  "version": "0.0.1",
   "description": "caching layer backend for i18next using browsers localStorage",
   "main": "./dist/cjs/i18nextLocalStorageBackend.js",
   "module": "./dist/esm/i18nextLocalStorageBackend.js",
@@ -42,6 +42,9 @@
     "tsd": "0.29.0",
     "tslint": "5.20.1",
     "typescript": "5.2.2"
+  },
+  "peerDependencies": {
+    "react-native-mmkv":"*"
   },
   "scripts": {
     "lint": "eslint ./src/*",
