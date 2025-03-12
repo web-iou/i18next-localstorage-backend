@@ -1,7 +1,7 @@
 {
   "name": "i18next-mmkv-backend",
   "version": "1.0.1",
-  "description": "caching layer backend for i18next using browsers localStorage",
+  "description": "caching layer backend for i18next using mmkv --template",
   "main": "./dist/cjs/i18nextLocalStorageBackend.js",
   "module": "./dist/esm/i18nextLocalStorageBackend.js",
   "types": "./index.d.ts",
@@ -11,10 +11,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/i18next/i18next-localStorage-backend.git"
+    "url": "https://github.com/web-iou/i18next-mmkv-backend.git"
   },
-  "homepage": "https://github.com/i18next/i18next-localStorage-backend",
-  "bugs": "https://github.com/i18next/i18next-localStorage-backend/issues",
+  "homepage": "https://github.com/web-iou/i18next-mmkv-backend",
+  "bugs": "https://github.com/web-iou/i18next-mmkv-backend/issues",
   "dependencies": {
     "@babel/runtime": "^7.22.15"
   },
@@ -44,7 +44,7 @@
     "typescript": "5.2.2"
   },
   "peerDependencies": {
-    "react-native-mmkv":"*"
+    "react-native-mmkv": "*"
   },
   "scripts": {
     "lint": "eslint ./src/*",
