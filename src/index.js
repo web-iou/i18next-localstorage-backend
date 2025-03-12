@@ -1,4 +1,3 @@
-import { MMKV } from "react-native-mmkv";
 /* eslint-disable max-classes-per-file */
 class Storage {
   constructor(options) {
@@ -28,20 +27,11 @@ class Storage {
 }
 
 function getDefaults() {
-  let store;
-  try {
-    store = new MMKV();
-  } catch (e) {
-    if (typeof window !== "undefined") {
-      console.log("Failed to load local storage.", e);
-    }
-  }
   return {
     prefix: "i18next_res_",
     expirationTime: 7 * 24 * 60 * 60 * 1000,
     defaultVersion: undefined,
     versions: {},
-    store,
   };
 }
 

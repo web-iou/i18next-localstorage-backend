@@ -1,11 +1,12 @@
 import { BackendModule, ReadCallback } from "i18next";
+import { MMKV } from "react-native-mmkv";
 
 export interface LocalStorageBackendOptions {
   prefix?: string;
   expirationTime?: number;
   versions?: { [key: string]: string };
   defaultVersion?: string;
-  store?: any;
+  store: InstanceType<typeof MMKV>;
 }
 
 export default class I18NextLocalStorageBackend

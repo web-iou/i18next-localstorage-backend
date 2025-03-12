@@ -1,16 +1,9 @@
-# Introduction
-
-This is a i18next cache layer to be used in the browser. It will load and cache resources from localStorage and can be used in combination with the [chained backend](https://github.com/i18next/i18next-chained-backend).
-
 # Getting started
 
-Source can be loaded via [npm](https://www.npmjs.com/package/i18next-localstorage-backend) or [downloaded](https://github.com/i18next/i18next-localstorage-backend/blob/master/i18nextLocalStorageBackend.min.js) from this repo.
-
-- If you don't use a module loader it will be added to window.i18nextLocalStorageBackend
 
 ```
 # npm package
-$ npm install i18next-localstorage-backend
+$ npm install i18next-mmkv-backend
 ```
 
 Wiring up with the chained backend:
@@ -18,25 +11,55 @@ Wiring up with the chained backend:
 ```js
 import i18next from 'i18next';
 import Backend from 'i18next-chained-backend';
-import LocalStorageBackend from 'i18next-localstorage-backend'; // primary use cache
-import HttpApi from 'i18next-http-backend'; // fallback http load
+import LocalStorageBackend from 'i18next-mmkv-backend'; // primary use cache
+import HttpApi ,{type HttpBackendOptions}from 'i18next-http-backend'; // fallback http load
 
 i18next
-  .use(Backend)
-  .init({
-    backend: {
-      backends: [
-        LocalStorageBackend,  // primary backend
-        HttpApi               // fallback backend
-      ],
-      backendOptions: [{
-        /* options for primary backend */
-      }, {
-        /* options for secondary backend */
-        loadPath: '/locales/{{lng}}/{{ns}}.json' // http load path for my own fallback
-      }]
-    }
-  });
+        .use(Backend)
+        .use(HttpApi)
+        .init<HttpBackendOptions>({
+          lng: language ?? 'zh-CN',
+          load: 'currentOnly',
+          fallbackLng: false,
+          backend: {
+            /* options for primary backend */
+            request: async function (_, url, __, callback) {
+              const localstorage = new LocalStorageBackend(null,{
+                store:new MMKV()
+              });
+              try {
+                const {data} = await request({
+                  method: 'get',
+                  url,
+                });
+                localstorage.save(language ?? 'zh-CN', 'translation', data);
+                callback(null, {
+                  status: 200,
+                  data,
+                });
+              } catch (e) {
+                localstorage.read(
+                  language ?? 'zh-CN',
+                  'translation',
+                  (_, data) => {
+                    if (data) {
+                      callback(null, {
+                        status: 200,
+                        data: data as string,
+                      });
+                    } else {
+                      Alert.alert('Tip', 'Network is unavailable!');
+                      setLoading(false);
+                    }
+                  },
+                );
+              }
+            },
+            loadPath:
+              (__DEV__ ? VITE_GEN_PROXY_PATH : void 0) +
+              '/admin/trm/web/{{lng}}',
+          },
+        });
 ```
 
 ## Cache Backend Options
@@ -55,9 +78,6 @@ i18next
 
   // language versions
   versions: {},
-
-  // can be either window.localStorage or window.sessionStorage. Default: window.localStorage
-  store: typeof window !== 'undefined' ? window.localStorage : null
 };
 ```
 
@@ -67,31 +87,3 @@ i18next
 
 - Passing in a `defaultVersion` string (ex.: `version: 'v1.2'`) will act as if you applied a version to all languages using `versions` option.
 
-- The test on window makes this package available for SSR environments like NextJS
-
-## IMPORTANT ADVICE for the usage in combination with saveMissing/updateMissing
-
-We suggest not to use a caching layer in combination with saveMissing or updateMissing, because it may happen, that the trigger for this is based on stale data.
-
-
---------------
-
-<h3 align="center">Gold Sponsors</h3>
-
-<p align="center">
-  <a href="https://locize.com/" target="_blank">
-    <img src="https://raw.githubusercontent.com/i18next/i18next/master/assets/locize_sponsor_240.gif" width="240px">
-  </a>
-</p>
-
----
-
-**localization as a service - locize.com**
-
-Needing a translation management? Want to edit your translations with an InContext Editor? Use the orginal provided to you by the maintainers of i18next!
-
-![locize](https://locize.com/img/ads/github_locize.png)
-
-With using [locize](http://locize.com/?utm_source=react_i18next_readme&utm_medium=github) you directly support the future of i18next and react-i18next.
-
----
